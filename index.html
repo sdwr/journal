@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	
+	<title></title>
+
+	<link rel="stylesheet" type="text/css" href="https://unpkg.com/pell/dist/pell.min.css">
+	<link rel="stylesheet" href="main.css">
+
+	
+</head>
+<body>
+	<div id="app">
+		<div id="header">
+			{{message}}
+		</div>
+		<div id="app-body">
+			<div id="posts-container">
+				<ul id="posts">
+					<li class="post" v-bind:class="{selected: isSelected(post)}" 
+					v-for="post in posts" v-on:click="openPost(post)">
+						<b>{{post.title}}</b>
+						<br>
+						<i>{{post.timestamp}}</i>
+						<div v-html=post.content></div>
+					</li>
+				</ul>
+				<div id="new-post">
+					<button id="new-button" v-on:click="createPost()">
+						+ New Post
+					</button>
+				</div>
+			</div>
+			<div id="editor-container">
+				<input id="editor-title" v-model="currentPost.title"> </input>
+				<div id="editor"></div>
+				<button id="save-button" v-on:click="savePost(currentPost)">Save</button>
+				<button id="delete-button" v-on:click="deletePost(currentPost)">Delete</button>
+			</div>
+		</div>
+	</div>
+
+
+	<script src="https://unpkg.com/pell"></script>
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	<script src="main.js"></script>
+</body>
+</html>
