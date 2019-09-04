@@ -1,0 +1,30 @@
+version: '3'
+services:
+  db:
+    restart: always
+    image: postgres:9.6
+    volumes:
+      - postgres-volume:/var/lib/postgres-volume
+    ports:
+      - "5432"
+    environment:
+      - POSTGRES_USER=docker
+      - POSTGRES_PASSWORD=docker
+      - PGDATA=/pgdata
+
+  app:
+    build:
+      context: ./app
+      args:
+        app_env: ${APP_ENV}
+    volumes:
+      - ./app:/go/src/github.com/sdwr/journal/app
+    ports:
+      - "4404:4404"
+    links:
+      - db
+
+volumes:
+  postgres-volume:
+    external: true
+
