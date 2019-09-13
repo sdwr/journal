@@ -1,52 +1,48 @@
 import {api} from './api.js';
 
-let nextID = initIDGenerator()
-
 const app = new Vue({
 	el: '#app',
 	data: {
 		message: "Journal builder 0.1",
 		posts: [],
-		currentPost: {Title:"new post", CreatedAt: "2222", Content: "hi"}
+		currentPost: {Title:"", CreatedAt: "", Content: "", ID:null}
 	},
 	created: function() {
-		api.getPosts()
-			.then(response => response.json())
-			.then(json => {
-				this.posts = JSON.parse(JSON.stringify(json))
-				this.currentPost = this.posts[0];
-			})
+		this.loadPosts();
 	},
 	methods: {
+		loadPosts: function() {
+			api.getPosts()
+				.then(response => response.json())
+				.then(json => {
+				this.posts = JSON.parse(JSON.stringify(json));
+				let currentIndex = this.findPost(this.currentPost);
+				if(currentIndex > -1) {
+					this.openPost(this.posts[currentIndex])
+				} else if(this.posts.length > 0) {
+					this.openPost(this.posts[0])
+				}
+			})
+		},
 		newPost: function() {
 			this.savePost(this.currentPost);
 			this.createPost();
 		},
 		createPost: function() {
-			this.savePost(createNewPost());
+			api.createPost(createNewPost())
+				.then(_ => this.loadPosts());
 		},
 		savePost: function(post) {
-			let postCopy = {};
-			Object.assign(postCopy, post);
-			let postIndex = this.findPost(postCopy);
-			if(postIndex >= 0) {
-				this.posts[postIndex] = postCopy;
-				this.posts.push({});
-				this.posts.pop();
-			} else {
-				this.posts.push(postCopy);
-			}
+			api.updatePost(post)
+				.then(_ => this.loadPosts());
 		},
 		openPost: function(post) {
-			Object.assign(this.currentPost, post);
-			editor.content.innerHTML = post.Content;
+			this.currentPost = post;
+			editor.content.innerHTML = this.currentPost.Content;
 		},
 		deletePost: function(post) {
-			let postIndex = this.findPost(post);
-			if(postIndex >= 0 && this.posts.length > 0) {
-				this.posts.splice(postIndex, 1);
-				this.openPost(this.posts[0])
-			}
+			api.deletePost(post.ID)
+				.then(_ => this.loadPosts());
 		},
 		findPost: function(post) {
 			return this.posts.findIndex(p => p.ID === post.ID);
@@ -67,16 +63,8 @@ pell.init({
 
 function createNewPost() {
 	return {
-		ID: nextID(),
+		ID: null,
 		Title: "New post",
 		Content: ""
 	}
-}
-
-function initIDGenerator() {
-	let next = 1;
-	let idGenerator = function() {
-		return next++;
-	}
-	return idGenerator;
 }

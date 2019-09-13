@@ -31,15 +31,15 @@ function updatePost(post) {
     options.mode = 'cors';
     options.headers = {'Content-Type': 'application/json'}
     options.body = JSON.stringify(post);
-    return fetch(SERVER_URL + `posts/${post.ID}`, options);
+    return fetch(SERVER_URL + `/posts/${post.ID}`, options);
 }
 
 function deletePost(postID) {
     const options = {}
-    options.method = 'PATCH';
+    options.method = 'DELETE';
     options.mode = 'cors';
     options.headers = {'Content-Type': 'application/json'}
-    return fetch(SERVER_URL + `posts/${postID}`)
+    return fetch(SERVER_URL + `/posts/${postID}`, options);
 }
 
 export const api = {getPosts, createPost, getOnePost, updatePost, deletePost};
